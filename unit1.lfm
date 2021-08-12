@@ -1,0 +1,85 @@
+object Form1: TForm1
+  Left = 2807
+  Height = 496
+  Top = 258
+  Width = 519
+  Caption = 'Form1'
+  ClientHeight = 496
+  ClientWidth = 519
+  OnCreate = FormCreate
+  LCLVersion = '2.0.6.0'
+  object labelObj: TLabel
+    Left = 24
+    Height = 15
+    Top = 24
+    Width = 142
+    Caption = 'Simple UDP  Listener '
+    ParentColor = False
+  end
+  object Memo1: TMemo
+    Left = 16
+    Height = 168
+    Top = 280
+    Width = 488
+    Lines.Strings = (
+      'Memo1'
+    )
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+  object inputGrid: TStringGrid
+    Left = 16
+    Height = 136
+    Top = 88
+    Width = 488
+    ColCount = 2
+    DefaultColWidth = 244
+    FixedRows = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goEditing, goSmoothScroll]
+    ScrollBars = ssAutoHorizontal
+    TabOrder = 1
+  end
+  object btConnect: TButton
+    Left = 16
+    Height = 25
+    Top = 248
+    Width = 152
+    Caption = 'Connect'
+    OnClick = btConnectClick
+    TabOrder = 2
+  end
+  object btSave: TButton
+    Left = 408
+    Height = 25
+    Top = 248
+    Width = 96
+    Caption = 'Save'
+    OnClick = btSaveClick
+    TabOrder = 3
+  end
+  object btLoad: TButton
+    Left = 296
+    Height = 25
+    Top = 248
+    Width = 105
+    Caption = 'Load'
+    TabOrder = 4
+  end
+  object btClear: TToggleBox
+    Left = 429
+    Height = 25
+    Top = 456
+    Width = 75
+    Caption = 'Clear'
+    OnClick = btClearClick
+    TabOrder = 5
+  end
+  object UDPComponent: TLUDPComponent
+    Port = 0
+    OnReceive = UDPComponentReceive
+    OnError = UDPComponentError
+    Timeout = 0
+    left = 272
+    top = 8
+  end
+end
