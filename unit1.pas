@@ -16,7 +16,10 @@ type
     btConnect: TButton;
     btSave: TButton;
     btLoad: TButton;
+    btForceSend: TButton;
+    btForceClose: TButton;
     labelObj: TLabel;
+    LUDPComponent1: TLUDPComponent;
     Memo1: TMemo;
     inputGrid: TStringGrid;
     btClear: TToggleBox;
@@ -25,7 +28,11 @@ type
 
     procedure btClearClick(Sender: TObject);
     procedure btConnectClick(Sender: TObject);
+    procedure btForceSendClick(Sender: TObject);
+    procedure btLoadClick(Sender: TObject);
     procedure btSaveClick(Sender: TObject);
+    procedure btForceCloseClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure UDPComponentError(const msg: string; aSocket: TLSocket);
     procedure UDPComponentReceive(aSocket: TLSocket);
@@ -78,11 +85,37 @@ begin
 
     Memo1.Clear;
 
-    UDPComponent.Listen(StrToIntDef(listen_addr, listen_port));
+    UDPComponent.Host:= listen_addr;
+    UDPComponent.Port:= listen_port;
+    UDPComponent.Listen();
+
+    //UDPComponent.Listen(StrToIntDef(listen_addr, listen_port));
+    //UDPComponent.Connect(listen_addr, listen_port);
+    LUDPComponent1.Connect(pub_addr,pub_port);
+    //LUDPComponent1.Listen(StrToIntDef(pub_addr, pub_port));
     Memo1.Append('Waiting Request at:');
     Memo1.Append(listen_addr + ':' + IntToStr(listen_port) );
 
     first := False;
+end;
+
+procedure TForm1.btForceSendClick(Sender: TObject);
+var
+  aux:string;
+begin
+    Memo1.Clear;
+    Memo1.Append('Forcing send message to: ');
+    aux := pub_addr + ':' + IntToStr(pub_port);
+    Memo1.Append(aux);
+    LUDPComponent1.SendMessage(msg);
+end;
+
+procedure TForm1.btLoadClick(Sender: TObject);
+begin
+     inputGrid.LoadFromCSVFile('conf.config', ',');
+     Memo1.Clear;
+     Memo1.Append('Loading saved config');
+
 end;
 
 procedure TForm1.btClearClick(Sender: TObject);
@@ -90,7 +123,13 @@ begin
     Memo1.Clear;
     if not first then
     begin
-             UDPComponent.Listen(StrToIntDef(listen_addr, listen_port));
+              UDPComponent.Host:= listen_addr;
+              UDPComponent.Port:= listen_port;
+              UDPComponent.Listen();
+             //UDPComponent.Listen(StrToIntDef(listen_addr, listen_port));
+             //UDPComponent.Connect(listen_addr, listen_port);
+             //LUDPComponent1.Listen(StrToIntDef(pub_addr, pub_port));
+             LUDPComponent1.Connect(pub_addr,pub_port);
              Memo1.Append('Waiting Request at:');
              Memo1.Append(listen_addr + ':' + IntToStr(listen_port) );
     end;
@@ -99,6 +138,19 @@ end;
 procedure TForm1.btSaveClick(Sender: TObject);
 begin
       inputGrid.SaveToCSVFile('conf.config', ',',true,false);
+end;
+
+procedure TForm1.btForceCloseClick(Sender: TObject);
+begin
+    Memo1.Append('Closing sockets');
+    UDPComponent.Disconnect();
+    LUDPComponent1.Disconnect();
+end;
+
+procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+   UDPComponent.Disconnect();
+   LUDPComponent1.Disconnect();
 end;
 
 procedure TForm1.UDPComponentReceive(aSocket: TLSocket);
@@ -111,9 +163,12 @@ begin
     UDPComponent.GetMessage(msgbuf);
     Memo1.Append(msgbuf);
     Memo1.Append('Send message back to: ');
-    Memo1.Append(pub_addr + ':' + IntToStr(pub_port) );
     aux := pub_addr + ':' + IntToStr(pub_port);
-    UDPComponent.SendMessage(msg,aux);
+    Memo1.Append(aux);
+
+    LUDPComponent1.SendMessage(msg);
+
+
     //UDPComponent.SendMessage('ACK from Lazarus',addr);
 end;
 
